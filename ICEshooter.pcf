@@ -1,0 +1,35 @@
+# ##############################################################################
+
+# iCEcube PCF
+
+# Family & Device:    iCE40HX8K
+
+# Package:            CT256
+
+# ##############################################################################
+###IOSet List 16
+
+set_io clk J3 #12MHz internal clock
+
+set_io LED3 A2
+set_io LED7 B3
+set_io LED2 B4
+set_io LED4 A1
+set_io LED6 C4
+set_io LED8 C3
+set_io LED1 B5
+set_io LED5 C5
+
+set_io rx B10
+set_io tx B12
+
+set_io pR B16
+set_io pG C16
+set_io pB D16
+set_io pHs F16
+set_io pVs E14
+
+set_io -pullup yes swL P15
+set_io -pullup yes swR P16
+set_io -pullup yes swF R15
+
