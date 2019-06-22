@@ -1,5 +1,5 @@
 /*
-This module generates sync signals to display a 299x476 VGA image using a 12MHz clock.
+This module generates sync signals to display a 299x238 VGA image using a 12MHz clock.
  V_pos and H_pos are the position of the current pixel.
  VGA_enable is the blanking signal that must be applied to the colours output signals.
 */
@@ -41,6 +41,6 @@ module VGA(
    assign V_sync = (V_cntr>45);
    assign VGA_enable = (((H_cntr>84)&(H_cntr<384))&((V_cntr>45)&(V_cntr<522)));
    assign H_pos = (H_cntr-85)*((H_cntr>84)&(H_cntr<384));
-   assign V_pos = (V_cntr-46)*((V_cntr>45)&(V_cntr<522));
+   assign V_pos = ((V_cntr-46)>>1)*((V_cntr>45)&(V_cntr<522));//The vertical resolution is divided by 2 to have square(ish) pixels
 
 endmodule // VGA
