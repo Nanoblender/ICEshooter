@@ -1,3 +1,5 @@
+
+
 module top(
 	   input  clk,
 	   input  rx, 
@@ -34,6 +36,12 @@ module top(
    reg 		  swRp;
    reg 		  swFp;
    reg 		  sprite[0:1][0:7][0:7];
+   reg 		  numbers[0:9][0:4][0:2];
+   reg 		  chartable[0:39][0:4][0:4];
+   reg [5:0] 	  k;
+   
+
+   
    wire 	  Vs;
    wire 	  Hs;
    wire 	  VGA_en;
@@ -43,6 +51,8 @@ module top(
 
    initial begin
       $readmemb("sprites", sprite);
+      $readmemb("numbers", numbers);
+      $readmemb("char5x5", chartable);
    end
    
    VGA VGA_out(
@@ -57,14 +67,27 @@ module top(
 
 
   
-   wire 	  T_cntr_maxed = (T_cntr==20000);
-      
+   wire 	  T_cntr_maxed = (T_cntr==40000);
+
+
    
-   wire 	  Wdraw=(((H_pos==bX)|(H_pos==bX+1))&((V_pos==bY)|(V_pos==bY+1)));
+   wire 	  testchar_s=(H_pos-200>0)&(H_pos-200<6)&(V_pos-10>0)&(V_pos-10<6) & chartable[k][V_pos-11][H_pos-200-1];
+   
+   wire 	  number6_s=(H_pos-250>0)&(H_pos-250<4)&(V_pos-10>-0)&(V_pos-10<6) & numbers[1][V_pos-11][H_pos-250-1];
+   wire 	  number5_s=(H_pos-250-4>0)&(H_pos-250-4<4)&(V_pos-10>-0)&(V_pos-10<6) & numbers[7][V_pos-11][H_pos-250-4-1];
+   wire 	  number4_s=(H_pos-250-8>0)&(H_pos-250-8<4)&(V_pos-10>-0)&(V_pos-10<6) & numbers[7][V_pos-11][H_pos-250-8-1];
+   wire 	  number3_s=(H_pos-250-12>0)&(H_pos-250-12<4)&(V_pos-10>-0)&(V_pos-10<6) & numbers[0][V_pos-11][H_pos-250-12-1];
+   wire 	  number2_s=(H_pos-250-16>0)&(H_pos-250-16<4)&(V_pos-10>-0)&(V_pos-10<6) & numbers[1][V_pos-11][H_pos-250-16-1];
+   wire 	  number1_s=(H_pos-250-20>0)&(H_pos-250-20<4)&(V_pos-10>-0)&(V_pos-10<6) & numbers[3][V_pos-11][H_pos-250-20-1];
+   wire 	  score_s=number1_s|number2_s|number3_s|number4_s|number5_s|number6_s;
+   
 
-   wire 	  onsprite=(H_pos-X>0)&(H_pos-X<9)&(V_pos-Y>-0)&(V_pos-Y<9)&sprite[0][V_pos-Y-1][H_pos-X-1];
 
-   wire 	  ennemy=(H_pos-Xe>0)&(H_pos-Xe<9)&(V_pos-Ye>-0)&(V_pos-Ye<9)&sprite[1][V_pos-Ye-1][H_pos-Xe-1];
+   
+   wire 	  border=(H_pos==0)|(H_pos==298)|(V_pos==0)|(V_pos==237);
+   wire 	  bullet_s=(((H_pos==bX)|(H_pos==bX+1))&((V_pos==bY)|(V_pos==bY+1)));
+   wire 	  player_s=(H_pos-X>0)&(H_pos-X<9)&(V_pos-Y>-0)&(V_pos-Y<9)&sprite[0][V_pos-Y-1][H_pos-X-1];
+   wire 	  ennemy1_s=(H_pos-Xe>0)&(H_pos-Xe<9)&(V_pos-Ye>-0)&(V_pos-Ye<9)&sprite[1][V_pos-Ye-1][H_pos-Xe-1];
    
    
 
@@ -73,14 +96,12 @@ module top(
      begin
 	swLp<=swL;
 	swRp<=swR;
-	if((swLp))
+	if(T_cntr_maxed)
 	  begin
-	     if(~swL)X<=X-1;
+	     if(~swL & ~(X==0))X<=X-1;
+	     if(~swR & ~(X==290))X<=X+1;
 	  end
-	if((swRp))
-	  begin
-	     if(~swR)X<=X+1;
-	  end
+	else X<=X;
      end
 
 
@@ -94,6 +115,8 @@ module top(
 	  end	
 	else if((swFp))
 	  begin
+	     if(~swF)k<=k+1;
+	     
 	     if(~swF & (bY==476))
 	       begin
 		  bX<=X+3;
@@ -109,9 +132,9 @@ module top(
      end
    
    
-   assign pR=VGA_en&((H_pos==0)|(H_pos==298)|Wdraw|onsprite);
-   assign pG=VGA_en&((V_pos==0)|(V_pos==237)|Wdraw|onsprite);
-   assign pB=VGA_en&(Wdraw|ennemy);
+   assign pR=VGA_en&(border|bullet_s|player_s|score_s);
+   assign pG=VGA_en&(border|bullet_s|player_s|testchar_s);
+   assign pB=VGA_en&(border|ennemy1_s|bullet_s|player_s);
    assign pHs=Hs;
    assign pVs=Vs;
    
