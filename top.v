@@ -24,22 +24,24 @@ module top(
 	   output LED8	   
 	   );
 
-   reg  	  R;
-   reg [8:0]      bX=0;
-   reg [8:0]   	  bY=0;
-   reg [8:0]      X=150;
-   reg [8:0]   	  Y=200;
-   reg [8:0]      Xe=150;
-   reg [8:0]   	  Ye=85;
    reg [25:0] 	  T_cntr;
-   reg 		  swLp;
-   reg 		  swRp;
-   reg 		  swFp;
-   reg 		  sprite[0:1][0:7][0:7];
-   reg 		  numbers[0:9][0:4][0:2];
    reg 		  chartable[0:39][0:4][0:4];
-   reg [5:0] 	  k;
-   
+   reg [4:0] 	  road_Y;
+   reg [7:0] 	  speed_cntr;
+   reg [7:0] 	  speed=100;
+   reg 		  Vs_p;
+   reg 		  clk_en_60Hz;
+   reg 		  T_cntr_maxed_re;
+   reg [8:0] 	  player_X=150;
+   reg [8:0] 	  player_Y=215;
+   reg 		  player_s;
+   reg 		  e1_s;
+   reg [8:0] 	  e1_X=130;
+   reg [8:0] 	  e1_Y=190;
+   reg [6:0] 	  k;
+   reg [19:0] 	  score=1000004;
+   reg [8:0] 	  score_X=260;
+   reg [8:0] 	  score_Y=10;
 
    
    wire 	  Vs;
@@ -47,94 +49,140 @@ module top(
    wire 	  VGA_en;
    wire [8:0] 	  V_pos;
    wire [8:0] 	  H_pos;
-
-
-   initial begin
-      $readmemb("sprites", sprite);
-      $readmemb("numbers", numbers);
-      $readmemb("char5x5", chartable);
-   end
+   wire 	  road1_s;
+   wire 	  road2_s;  
+   wire 	  roadl_s;  
+   wire 	  six_dig;
    
    VGA VGA_out(
-	       .clk(clk),
-	       .V_sync(Vs),
-	       .H_sync(Hs),
-	       .V_pos(V_pos),
+ 	       .clk(clk),
+ 	       .V_sync(Vs),
+  	       .H_sync(Hs),
+ 	       .V_pos(V_pos),
 	       .H_pos(H_pos),
 	       .VGA_enable(VGA_en)
 	       );
    
+   r_edge_detector re_clk_60Hz(
+			       .clk(clk),
+			       .sig(Vs),
+			       .detected(clk_en_60Hz)
+			       );
+   r_edge_detector re_T_cntr(
+			     .clk(clk),
+			     .sig(T_cntr_maxed),
+			     .detected(T_cntr_maxed_re)
+			     );
 
 
+   six_digit_display score_display(
+				   .clk(clk),
+				   .sauce(score),
+				   .X(score_X),
+				   .Y(score_Y),
+				   .H_pos(H_pos),
+				   .V_pos(V_pos),
+				   .six_digit_number(six_dig)
+				   );
+
+   
+   sprite_gen player_spr(
+			 .sprite_table(0),
+			 .sprite_number(1),
+			 .X(player_X),
+			 .Y(player_Y),
+			 .H_pos(H_pos),
+			 .V_pos(V_pos),
+			 .state(player_s)
+			 );
+
+
+   sprite_gen ennemy1_spr(
+			  .sprite_table(0),
+			  .sprite_number(0),
+			  .X(e1_X),
+			  .Y(e1_Y),
+			  .H_pos(H_pos),
+			  .V_pos(V_pos),
+			  .state(e1_s)
+			  );
+
+
+   road_gen rd1_spr(
+		    .sprite_number(2),
+		    .X(48),
+		    .Y(road_Y),
+		    .H_pos(H_pos),
+		    .V_pos(V_pos),
+		    .mirror(0),
+		    .state(road1_s)
+		    );
+
+   
+   road_gen rd2_spr(
+		    .sprite_number(2),
+		    .X(224),
+		    .Y(road_Y),
+		    .H_pos(H_pos),
+		    .V_pos(V_pos),
+		    .mirror(1),
+		    .state(road2_s)
+		    );
+   
+
+   road_line_gen rdl_spr(
+		    .sprite_number(3),
+		    .Y(road_Y),
+		    .H_pos(H_pos),
+		    .V_pos(V_pos),
+		    .state(roadl_s)
+		    );
+   
   
-   wire 	  T_cntr_maxed = (T_cntr==40000);
-
-
    
-   wire 	  testchar_s=(H_pos-200>0)&(H_pos-200<6)&(V_pos-10>0)&(V_pos-10<6) & chartable[k][V_pos-11][H_pos-200-1];
-   
-   wire 	  number6_s=(H_pos-250>0)&(H_pos-250<4)&(V_pos-10>-0)&(V_pos-10<6) & numbers[1][V_pos-11][H_pos-250-1];
-   wire 	  number5_s=(H_pos-250-4>0)&(H_pos-250-4<4)&(V_pos-10>-0)&(V_pos-10<6) & numbers[7][V_pos-11][H_pos-250-4-1];
-   wire 	  number4_s=(H_pos-250-8>0)&(H_pos-250-8<4)&(V_pos-10>-0)&(V_pos-10<6) & numbers[7][V_pos-11][H_pos-250-8-1];
-   wire 	  number3_s=(H_pos-250-12>0)&(H_pos-250-12<4)&(V_pos-10>-0)&(V_pos-10<6) & numbers[0][V_pos-11][H_pos-250-12-1];
-   wire 	  number2_s=(H_pos-250-16>0)&(H_pos-250-16<4)&(V_pos-10>-0)&(V_pos-10<6) & numbers[1][V_pos-11][H_pos-250-16-1];
-   wire 	  number1_s=(H_pos-250-20>0)&(H_pos-250-20<4)&(V_pos-10>-0)&(V_pos-10<6) & numbers[3][V_pos-11][H_pos-250-20-1];
-   wire 	  score_s=number1_s|number2_s|number3_s|number4_s|number5_s|number6_s;
-   
-
+   wire 	  T_cntr_maxed = (T_cntr==1199);
+   wire 	  speed_cntr_maxed=(speed_cntr==speed);
 
    
    wire 	  border=(H_pos==0)|(H_pos==298)|(V_pos==0)|(V_pos==237);
-   wire 	  bullet_s=(((H_pos==bX)|(H_pos==bX+1))&((V_pos==bY)|(V_pos==bY+1)));
-   wire 	  player_s=(H_pos-X>0)&(H_pos-X<9)&(V_pos-Y>-0)&(V_pos-Y<9)&sprite[0][V_pos-Y-1][H_pos-X-1];
-   wire 	  ennemy1_s=(H_pos-Xe>0)&(H_pos-Xe<9)&(V_pos-Ye>-0)&(V_pos-Ye<9)&sprite[1][V_pos-Ye-1][H_pos-Xe-1];
-   
-   
+
+	   
 
    
    always@(posedge clk)
      begin
-	swLp<=swL;
-	swRp<=swR;
-	if(T_cntr_maxed)
+	if(T_cntr_maxed_re)
 	  begin
-	     if(~swL & ~(X==0))X<=X-1;
-	     if(~swR & ~(X==290))X<=X+1;
-	  end
-	else X<=X;
-     end
-
-
-   always@(posedge clk)
-     begin
-	swFp<=swF;
-	if(T_cntr_maxed & ~(bY==476))
-	  begin
-	     if(bY==0)bY<=476;
-	     else bY<=bY-1;
-	  end	
-	else if((swFp))
-	  begin
-	     if(~swF)k<=k+1;
-	     
-	     if(~swF & (bY==476))
+	     if(speed_cntr_maxed)
 	       begin
-		  bX<=X+3;
-		  bY<=Y;
+		  speed_cntr<=0;
+		  road_Y<=road_Y+1;
+		  if(e1_Y==238)
+		    begin
+		       e1_Y<=0;
+		       e1_X<=72+k;
+		       k<=k+435;
+		       score<=score-1;
+		       
+		    end
+		  else e1_Y<=e1_Y+2;
+		  
 	       end
+	     else speed_cntr<=speed_cntr+1;
 	  end
      end
+
+   
    
    always@(posedge clk)
      begin
 	if(T_cntr_maxed)T_cntr<=0;
 	else T_cntr<=T_cntr+1;
      end
-   
-   
-   assign pR=VGA_en&(border|bullet_s|player_s|score_s);
-   assign pG=VGA_en&(border|bullet_s|player_s|testchar_s);
-   assign pB=VGA_en&(border|ennemy1_s|bullet_s|player_s);
+
+   assign pR=VGA_en&(border|player_s|road1_s|road2_s|six_dig);
+   assign pG=VGA_en&(border|player_s|(roadl_s&~e1_s)|six_dig);
+   assign pB=VGA_en&(border|player_s|e1_s|six_dig);
    assign pHs=Hs;
    assign pVs=Vs;
    
