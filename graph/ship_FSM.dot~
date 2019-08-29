@@ -1,0 +1,16 @@
+Digraph finite_state_machine {
+	graph [ dpi = 200 ]; 
+	ranksep=2; size = "7.5,7.5";
+	INIT;
+	SPAWN [label="spawn animation"];
+	PL [label="playing"];
+	ML [label="moving left"];
+	MR [label="moving right"];
+	MLF [label="moving left fast"];
+	MRF [label="moving right fast"];
+	
+
+
+
+
+}

@@ -24,25 +24,26 @@ module top(
 	   output LED8	   
 	   );
 
+   
    reg [25:0] 	  T_cntr;
    reg 		  chartable[0:39][0:4][0:4];
    reg [4:0] 	  road_Y;
    reg [7:0] 	  speed_cntr;
-   reg [7:0] 	  speed=100;
+   reg [7:0] 	  speed=3;
    reg 		  Vs_p;
    reg 		  clk_en_60Hz;
    reg 		  T_cntr_maxed_re;
-   reg [8:0] 	  player_X=150;
+   reg [8:0] 	  player_X;
    reg [8:0] 	  player_Y=215;
    reg 		  player_s;
    reg 		  e1_s;
-   reg [8:0] 	  e1_X=130;
-   reg [8:0] 	  e1_Y=190;
+   wire [8:0] 	  e1_X;
+   wire [8:0] 	  e1_Y;
    reg [6:0] 	  k;
-   reg [19:0] 	  score=1000004;
    reg [8:0] 	  score_X=260;
    reg [8:0] 	  score_Y=10;
-
+   reg 		  bullet_s=0;
+   
    
    wire 	  Vs;
    wire 	  Hs;
@@ -53,7 +54,14 @@ module top(
    wire 	  road2_s;  
    wire 	  roadl_s;  
    wire 	  six_dig;
+   wire 	  swF_re;
+   wire [1:0] 	  lives;
+   wire [19:0] 	  score;
+   wire [1:0] 	  scene;
+   wire [4:0] 	  level;
+   wire 	  avoided;
    
+
    VGA VGA_out(
  	       .clk(clk),
  	       .V_sync(Vs),
@@ -72,6 +80,12 @@ module top(
 			     .clk(clk),
 			     .sig(T_cntr_maxed),
 			     .detected(T_cntr_maxed_re)
+			     );
+   
+   r_edge_detector re_swF_cntr(
+			     .clk(clk),
+			     .sig(!swF),
+			     .detected(swF_re)
 			     );
 
 
@@ -138,16 +152,53 @@ module top(
 		    .state(roadl_s)
 		    );
    
-  
-   
-   wire 	  T_cntr_maxed = (T_cntr==1199);
-   wire 	  speed_cntr_maxed=(speed_cntr==speed);
+  player plyr(
+	      .clk(clk),
+	      .clk_en(T_cntr_maxed_re),
+	      .swL(swL),
+	      .swR(swR),
+	      .scene(scene),
+	      .pos(player_X)
+	      );
 
+   ennemy enm1(
+	       .clk(clk),
+	       .clk_en(T_cntr_maxed_re),
+	       .colision(player_s & e1_s),
+	       .scene(scene),
+	       .X(e1_X),
+	       .Y(e1_Y),
+	       .avoided(avoided)
+	       );
+   
+   
+   game mainFSM(
+		.clk(clk),
+		.colision(player_s & e1_s),
+		.bullet_hit(bullet_s & e1_s),
+		.swF_re(swF_re),
+		.spawned(1),
+		.avoided(avoided),
+		.level(level),
+		.lives(lives),
+		.score(score),
+		.scene(scene)
+		);
+   
+
+
+
+
+
+		
+   wire 	  T_cntr_maxed = (T_cntr==70000);
+   wire 	  speed_cntr_maxed=(speed_cntr==speed);   
    
    wire 	  border=(H_pos==0)|(H_pos==298)|(V_pos==0)|(V_pos==237);
 
 	   
-
+   reg [19:0] 	  hit_cntr=0;
+   
    
    always@(posedge clk)
      begin
@@ -157,16 +208,6 @@ module top(
 	       begin
 		  speed_cntr<=0;
 		  road_Y<=road_Y+1;
-		  if(e1_Y==238)
-		    begin
-		       e1_Y<=0;
-		       e1_X<=72+k;
-		       k<=k+435;
-		       score<=score-1;
-		       
-		    end
-		  else e1_Y<=e1_Y+2;
-		  
 	       end
 	     else speed_cntr<=speed_cntr+1;
 	  end
@@ -176,23 +217,25 @@ module top(
    
    always@(posedge clk)
      begin
+	if(avoided)hit_cntr<=hit_cntr+1;
+	
 	if(T_cntr_maxed)T_cntr<=0;
 	else T_cntr<=T_cntr+1;
      end
 
    assign pR=VGA_en&(border|player_s|road1_s|road2_s|six_dig);
-   assign pG=VGA_en&(border|player_s|(roadl_s&~e1_s)|six_dig);
+   assign pG=VGA_en&(border|player_s|(roadl_s&~e1_s&(scene==1))|six_dig);
    assign pB=VGA_en&(border|player_s|e1_s|six_dig);
    assign pHs=Hs;
    assign pVs=Vs;
    
    assign tx=0;
-   assign LED1=0;
-   assign LED2=0;
+   assign LED1=(player_s&e1_s);
+   assign LED2=swL;
    assign LED3=0;
-   assign LED4=0;
+   assign LED4=swR;
    assign LED5=0;
-   assign LED6=0;
+   assign LED6=swF;
    assign LED7=0;
    assign LED8=0;
 
