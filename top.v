@@ -42,7 +42,6 @@ module top(
    reg [6:0] 	  k;
    reg [8:0] 	  score_X=260;
    reg [8:0] 	  score_Y=10;
-   reg 		  bullet_s=0;
    
    
    wire 	  Vs;
@@ -60,6 +59,8 @@ module top(
    wire [1:0] 	  scene;
    wire [4:0] 	  level;
    wire 	  avoided;
+   wire [8:0] 	  bullet_X;
+   wire [8:0] 	  bullet_Y;
    
 
    VGA VGA_out(
@@ -164,11 +165,22 @@ module top(
    ennemy enm1(
 	       .clk(clk),
 	       .clk_en(T_cntr_maxed_re),
-	       .colision(player_s & e1_s),
+	       .colision((player_s & e1_s)|(bullet_s & e1_s)),
 	       .scene(scene),
 	       .X(e1_X),
 	       .Y(e1_Y),
 	       .avoided(avoided)
+	       );
+   
+   bullet bul1(
+	       .clk(clk),
+	       .clk_en(T_cntr_maxed_re),
+	       .hit(bullet_s & e1_s),
+	       .swF_re(swF_re),
+	       .scene(scene),
+	       .player_X(player_X),
+	       .X(bullet_X),
+	       .Y(bullet_Y)
 	       );
    
    
@@ -195,7 +207,8 @@ module top(
    wire 	  speed_cntr_maxed=(speed_cntr==speed);   
    
    wire 	  border=(H_pos==0)|(H_pos==298)|(V_pos==0)|(V_pos==237);
-
+   wire 	  bullet_s=((H_pos==bullet_X)|(H_pos==bullet_X+1))&((V_pos==bullet_Y)|(V_pos==bullet_Y+1));
+   
 	   
    reg [19:0] 	  hit_cntr=0;
    
@@ -223,9 +236,9 @@ module top(
 	else T_cntr<=T_cntr+1;
      end
 
-   assign pR=VGA_en&(border|player_s|road1_s|road2_s|six_dig);
-   assign pG=VGA_en&(border|player_s|(roadl_s&~e1_s&(scene==1))|six_dig);
-   assign pB=VGA_en&(border|player_s|e1_s|six_dig);
+   assign pR=VGA_en&(border|(player_s|road1_s|road2_s|bullet_s)&(scene==1)|six_dig);
+   assign pG=VGA_en&(border|(player_s|(roadl_s&~e1_s)|bullet_s)&(scene==1)|six_dig);
+   assign pB=VGA_en&(border|(player_s|e1_s|bullet_s)&(scene==1)|six_dig);
    assign pHs=Hs;
    assign pVs=Vs;
    

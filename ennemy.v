@@ -33,4 +33,4 @@ module ennemy(
    assign Y=Y_reg;
    assign avoided=Y_reg==238;
    
-endmodule // player
+endmodule // ennemy
