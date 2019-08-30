@@ -26,23 +26,13 @@ module top(
 
    
    reg [25:0] 	  T_cntr;
-   reg 		  chartable[0:39][0:4][0:4];
-   reg [4:0] 	  road_Y;
-   reg [7:0] 	  speed_cntr;
    reg [7:0] 	  speed=3;
    reg 		  Vs_p;
    reg 		  clk_en_60Hz;
    reg 		  T_cntr_maxed_re;
-   reg [8:0] 	  player_X;
-   reg [8:0] 	  player_Y=215;
-   reg 		  player_s;
-   reg 		  e1_s;
-   wire [8:0] 	  e1_X;
-   wire [8:0] 	  e1_Y;
-   reg [6:0] 	  k;
    reg [8:0] 	  score_X=260;
    reg [8:0] 	  score_Y=10;
-   
+   reg [8:0] 	  player_Y=215;
    
    wire 	  Vs;
    wire 	  Hs;
@@ -51,7 +41,8 @@ module top(
    wire [8:0] 	  H_pos;
    wire 	  road1_s;
    wire 	  road2_s;  
-   wire 	  roadl_s;  
+   wire 	  roadl_s;
+   wire [4:0]	  road_Y;  
    wire 	  six_dig;
    wire 	  swF_re;
    wire [1:0] 	  lives;
@@ -61,7 +52,11 @@ module top(
    wire 	  avoided;
    wire [8:0] 	  bullet_X;
    wire [8:0] 	  bullet_Y;
-   
+   wire 	  e1_s;
+   wire [8:0] 	  e1_X;
+   wire [8:0] 	  e1_Y;
+   wire [8:0] 	  player_X;
+   wire 	  player_s;
 
    VGA VGA_out(
  	       .clk(clk),
@@ -182,7 +177,13 @@ module top(
 	       .X(bullet_X),
 	       .Y(bullet_Y)
 	       );
-   
+   road roadscr(
+		.clk(clk),
+		.clk_en(T_cntr_maxed_re),
+		.scene(scene),
+		.speed(speed),
+		.Y(road_Y)
+		);
    
    game mainFSM(
 		.clk(clk),
@@ -204,34 +205,15 @@ module top(
 
 		
    wire 	  T_cntr_maxed = (T_cntr==70000);
-   wire 	  speed_cntr_maxed=(speed_cntr==speed);   
    
    wire 	  border=(H_pos==0)|(H_pos==298)|(V_pos==0)|(V_pos==237);
    wire 	  bullet_s=((H_pos==bullet_X)|(H_pos==bullet_X+1))&((V_pos==bullet_Y)|(V_pos==bullet_Y+1));
    
-	   
-   reg [19:0] 	  hit_cntr=0;
+	  
    
    
    always@(posedge clk)
-     begin
-	if(T_cntr_maxed_re)
-	  begin
-	     if(speed_cntr_maxed)
-	       begin
-		  speed_cntr<=0;
-		  road_Y<=road_Y+1;
-	       end
-	     else speed_cntr<=speed_cntr+1;
-	  end
-     end
-
-   
-   
-   always@(posedge clk)
-     begin
-	if(avoided)hit_cntr<=hit_cntr+1;
-	
+     begin	
 	if(T_cntr_maxed)T_cntr<=0;
 	else T_cntr<=T_cntr+1;
      end
