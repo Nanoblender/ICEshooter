@@ -57,7 +57,8 @@ module top(
    wire [8:0] 	  e1_Y;
    wire [8:0] 	  player_X;
    wire 	  player_s;
-
+   wire 	  hearts;
+   
    VGA VGA_out(
  	       .clk(clk),
  	       .V_sync(Vs),
@@ -79,12 +80,11 @@ module top(
 			     );
    
    r_edge_detector re_swF_cntr(
-			     .clk(clk),
-			     .sig(!swF),
-			     .detected(swF_re)
-			     );
-
-
+			       .clk(clk),
+			       .sig(!swF),
+			       .detected(swF_re)
+			       );
+   
    six_digit_display score_display(
 				   .clk(clk),
 				   .sauce(score),
@@ -95,7 +95,16 @@ module top(
 				   .six_digit_number(six_dig)
 				   );
 
-   
+   lives_display hearts_display(
+				.clk(clk),
+				.lives(lives),
+				.X(12),
+				.Y(12),
+				.H_pos(H_pos),
+				.V_pos(V_pos),
+				.lives_s(hearts)
+				);
+
    sprite_gen player_spr(
 			 .sprite_table(0),
 			 .sprite_number(1),
@@ -105,8 +114,7 @@ module top(
 			 .V_pos(V_pos),
 			 .state(player_s)
 			 );
-
-
+   
    sprite_gen ennemy1_spr(
 			  .sprite_table(0),
 			  .sprite_number(0),
@@ -116,8 +124,7 @@ module top(
 			  .V_pos(V_pos),
 			  .state(e1_s)
 			  );
-
-
+   
    road_gen rd1_spr(
 		    .sprite_number(2),
 		    .X(48),
@@ -127,7 +134,6 @@ module top(
 		    .mirror(0),
 		    .state(road1_s)
 		    );
-
    
    road_gen rd2_spr(
 		    .sprite_number(2),
@@ -139,24 +145,23 @@ module top(
 		    .state(road2_s)
 		    );
    
-
    road_line_gen rdl_spr(
-		    .sprite_number(3),
-		    .Y(road_Y),
-		    .H_pos(H_pos),
-		    .V_pos(V_pos),
-		    .state(roadl_s)
-		    );
+			 .sprite_number(3),
+			 .Y(road_Y),
+			 .H_pos(H_pos),
+			 .V_pos(V_pos),
+			 .state(roadl_s)
+			 );
    
-  player plyr(
-	      .clk(clk),
-	      .clk_en(T_cntr_maxed_re),
-	      .swL(swL),
-	      .swR(swR),
-	      .scene(scene),
-	      .pos(player_X)
-	      );
-
+   player plyr(
+	       .clk(clk),
+	       .clk_en(T_cntr_maxed_re),
+	       .swL(swL),
+	       .swR(swR),
+	       .scene(scene),
+	       .pos(player_X)
+	       );
+   
    ennemy enm1(
 	       .clk(clk),
 	       .clk_en(T_cntr_maxed_re),
@@ -177,6 +182,7 @@ module top(
 	       .X(bullet_X),
 	       .Y(bullet_Y)
 	       );
+   
    road roadscr(
 		.clk(clk),
 		.clk_en(T_cntr_maxed_re),
@@ -199,26 +205,21 @@ module top(
 		);
    
 
-
-
-
-
-		
-   wire 	  T_cntr_maxed = (T_cntr==70000);
    
-   wire 	  border=(H_pos==0)|(H_pos==298)|(V_pos==0)|(V_pos==237);
-   wire 	  bullet_s=((H_pos==bullet_X)|(H_pos==bullet_X+1))&((V_pos==bullet_Y)|(V_pos==bullet_Y+1));
-   
-	  
-   
+   wire 	  T_cntr_maxed = (T_cntr==70000);   
    
    always@(posedge clk)
      begin	
 	if(T_cntr_maxed)T_cntr<=0;
 	else T_cntr<=T_cntr+1;
      end
+   
 
-   assign pR=VGA_en&(border|(player_s|road1_s|road2_s|bullet_s)&(scene==1)|six_dig);
+   wire 	  border=(H_pos==0)|(H_pos==298)|(V_pos==0)|(V_pos==237);
+   wire 	  bullet_s=((H_pos==bullet_X)|(H_pos==bullet_X+1))&((V_pos==bullet_Y)|(V_pos==bullet_Y+1));
+
+
+   assign pR=VGA_en&(border|(player_s|road1_s|road2_s|bullet_s)&(scene==1)|six_dig|hearts);
    assign pG=VGA_en&(border|(player_s|(roadl_s&~e1_s)|bullet_s)&(scene==1)|six_dig);
    assign pB=VGA_en&(border|(player_s|e1_s|bullet_s)&(scene==1)|six_dig);
    assign pHs=Hs;
