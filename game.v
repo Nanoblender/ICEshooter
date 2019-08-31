@@ -6,9 +6,9 @@ module game(
 	    input 	  spawned,
 	    input 	  avoided,
 	    output [4:0]  level,
-	    output [2:0]  lives,
+	    output [1:0]  lives,
 	    output [19:0] score,
-	    output [1:0]  scene,
+	    output [1:0]  scene
 	    );
 
    reg [3:0] 		  state=0;
@@ -18,9 +18,7 @@ module game(
    reg [4:0] 		  level_reg=1;
    
    
-   integer 		  i,j,k;
-
-   parameter START=0000,INIT=00001,SPAWN=0010,PLAYING=0011,COLISION=0100,ENNEMY_HIT=0101,LEVEL_UP=0111,SCORE_UP=1000,LOST=1001;
+   parameter START=0,INIT=1,SPAWN=2,PLAYING=3,COLISION=4,ENNEMY_HIT=5,LEVEL_UP=6,SCORE_UP=7,LOST=8;
 
    //FSM operation
 
@@ -48,11 +46,11 @@ module game(
 	  PLAYING:
 	    begin
 	       scene_reg<=1;
-	       if(score_reg>level<<5)state<=LEVEL_UP;
-	       else if(colision)state<=COLISION;
+	       if(colision)state<=COLISION;
 	       else if(bullet_hit)state<=ENNEMY_HIT;
 	       else if(lives_reg==0)state<=LOST;
-	       else if(avoided)state<=SCORE_UP;		   
+	       else if(avoided)state<=SCORE_UP;
+	       //else if(score_reg>level)state<=LEVEL_UP;		   
 	    end
 	  COLISION:
 	    begin

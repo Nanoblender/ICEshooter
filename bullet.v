@@ -14,15 +14,14 @@ module bullet(
 
    reg [8:0] 		   X_reg=0;
    reg [8:0] 		   Y_reg=300;
-   reg [6:0] 		   k=0;
-   
+
    always@(posedge clk)
      begin
 	if(Y_reg==0)Y_reg<=300;
 	else if(swF_re & (Y_reg==300))
 	  begin
-	     X_reg=player_X+7;
-	     Y_reg=215;
+	     X_reg<=player_X+7;
+	     Y_reg<=215;
 	  end
 	else if(Y_reg<300 & clk_en)
 	  begin

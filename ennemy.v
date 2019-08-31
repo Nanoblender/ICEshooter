@@ -10,7 +10,7 @@ module ennemy(
 
    reg [8:0] 		   X_reg=130;
    reg [8:0] 		   Y_reg=190;
-   reg [6:0] 		   k=0;
+   reg [8:0] 		   k=0;
 
    always@(posedge clk)
      begin
@@ -19,7 +19,8 @@ module ennemy(
 	  begin
 	     Y_reg<=0;
 	     X_reg<=72+k;
-	     k<=k+435;
+	     if(k+51>128)k<=k-77;
+	     else k<=k+51;
 	  end
 	else if(clk_en)//clk/700000
 	  begin

@@ -7,6 +7,9 @@ module lives_display(
 		     input [8:0] V_pos,
 		     output 	 lives_s
 		     );
+
+   wire 			 heart1,heart2,heart0;
+   
    
    sprite_gen dig0(
 		   .sprite_table(2),

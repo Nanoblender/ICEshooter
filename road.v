@@ -7,7 +7,7 @@ module road(
 	    );
 
    reg [4:0] 		 Y_reg=0;
-   reg [6:0] 		 k=0;
+   reg [7:0] 		 k=0;
    wire 		 cntr_maxed=(k==speed);   
    
    always@(posedge clk)

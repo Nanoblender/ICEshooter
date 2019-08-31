@@ -1,7 +1,7 @@
 module road_gen(
-		  input [8:0] sprite_number,
+		  input [1:0] sprite_number,
 		  input [8:0] X,
-		  input [8:0] Y,
+		  input [4:0] Y,
 		  input [8:0] H_pos,
 		  input [8:0] V_pos,
 		  input       mirror,
@@ -10,18 +10,21 @@ module road_gen(
 
    reg 			      sprite[0:3][0:15][0:15];
    wire 		      show_this_sprite[0:3];
-
+   wire [4:0] 		      Y_diff=V_pos[4:0]-Y;
+   wire [3:0] 		      X_diff=H_pos[3:0]-X[3:0];
+   wire [4:0] 		      X_diffm=15-H_pos[4:0]+X[4:0];
+   
    
    initial begin
       $readmemb("sprites16", sprite);
    end
    
-   assign show_this_sprite[0] = (H_pos-X<16) & sprite[sprite_number][(V_pos-Y)&4'b1111][H_pos-X];
-   assign show_this_sprite[1] = (H_pos-X<16) & sprite[sprite_number][(V_pos-Y)&4'b1111][15-H_pos+X];
-   assign show_this_sprite[2] = (H_pos-X<16) & ~sprite[sprite_number][(V_pos-Y)&4'b1111][H_pos-X];
-   assign show_this_sprite[3] = (H_pos-X<16) & ~sprite[sprite_number][(V_pos-Y)&4'b1111][15-H_pos+X];
+   assign show_this_sprite[0] = (H_pos-X<16) & sprite[sprite_number][Y_diff[3:0]][X_diff];
+   assign show_this_sprite[1] = (H_pos-X<16) & sprite[sprite_number][Y_diff[3:0]][X_diffm[3:0]];//mirrored
+   assign show_this_sprite[2] = (H_pos-X<16) & ~sprite[sprite_number][Y_diff[3:0]][X_diff];//color inverted
+   assign show_this_sprite[3] = (H_pos-X<16) & ~sprite[sprite_number][Y_diff[3:0]][X_diffm[3:0]];//mirror and color inverted
 
-   assign state=show_this_sprite[mirror+((((V_pos-Y)&5'b11111)>15)<<1)];
+   assign state=show_this_sprite[{(Y_diff>15),mirror}];
    
    
    endmodule // sprite_gen

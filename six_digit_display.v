@@ -18,13 +18,13 @@ module six_digit_display(
    wire 			      digit3;
    wire 			      digit4;
    wire 			      digit5;
-
+   
    integer 			      k;
    
 
    sprite_gen dig0(
 		   .sprite_table(1),
-		   .sprite_number(six_digit_reg[0]),
+		   .sprite_number({5'b00000,six_digit_reg[0]}),
 		   .X(X+20),
 		   .Y(Y),
 		   .H_pos(H_pos),
@@ -34,7 +34,7 @@ module six_digit_display(
    
    sprite_gen dig1(
 		   .sprite_table(1),
-		   .sprite_number(six_digit_reg[1]),
+		   .sprite_number({5'b00000,six_digit_reg[1]}),
 		   .X(X+16),
 		   .Y(Y),
 		   .H_pos(H_pos),
@@ -43,7 +43,7 @@ module six_digit_display(
 		   );
    sprite_gen dig2(
 		   .sprite_table(1),
-		   .sprite_number(six_digit_reg[2]),
+		   .sprite_number({5'b00000,six_digit_reg[2]}),
 		   .X(X+12),
 		   .Y(Y),
 		   .H_pos(H_pos),
@@ -53,7 +53,7 @@ module six_digit_display(
 
    sprite_gen dig3(
 		   .sprite_table(1),
-		   .sprite_number(six_digit_reg[3]),
+		   .sprite_number({5'b00000,six_digit_reg[3]}),
 		   .X(X+8),
 		   .Y(Y),
 		   .H_pos(H_pos),
@@ -63,7 +63,7 @@ module six_digit_display(
    
    sprite_gen dig4(
 		   .sprite_table(1),
-		   .sprite_number(six_digit_reg[4]),
+		   .sprite_number({5'b00000,six_digit_reg[4]}),
 		   .X(X+4),
 		   .Y(Y),
 		   .H_pos(H_pos),
@@ -72,7 +72,7 @@ module six_digit_display(
 		   );
    sprite_gen dig5(
 		   .sprite_table(1),
-		   .sprite_number(six_digit_reg[5]),
+		   .sprite_number({5'b00000,six_digit_reg[5]}),
 		   .X(X),
 		   .Y(Y),
 		   .H_pos(H_pos),

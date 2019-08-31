@@ -1,6 +1,6 @@
 module sprite_gen(
-		  input [0:2] sprite_table,
-		  input [0:8] sprite_number,
+		  input [1:0] sprite_table,
+		  input [8:0] sprite_number,
 		  input [8:0] X,
 		  input [8:0] Y,
 		  input [8:0] H_pos,
@@ -12,7 +12,8 @@ module sprite_gen(
    reg 			      numbers[0:9][0:4][0:2];
    reg 			      chartable[0:39][0:4][0:4];
    wire 		      show_this_sprite[0:2];
-   
+   wire [8:0] 		      X_diff=H_pos-X;
+   wire [8:0] 		      Y_diff=V_pos-Y;
    
    initial begin
       $readmemb("sprites16", sprite);
@@ -20,9 +21,9 @@ module sprite_gen(
       $readmemb("char5x5", chartable);
    end
    
-   assign show_this_sprite[0] = (H_pos-X<16) & (V_pos-Y<16) & sprite[sprite_number][V_pos-Y][H_pos-X];
-   assign show_this_sprite[1] = (H_pos-X<3) & (V_pos-Y<5) & numbers[sprite_number][V_pos-Y][H_pos-X];
-   assign show_this_sprite[2] = (H_pos-X<5) & (V_pos-Y<5) & chartable[sprite_number][V_pos-Y][H_pos-X];
+   assign show_this_sprite[0] = (X_diff<16) & (Y_diff<16) & sprite[sprite_number[1:0]][Y_diff[3:0]][X_diff[3:0]];
+   assign show_this_sprite[1] = (X_diff<3) & (Y_diff<5) & numbers[sprite_number[3:0]][Y_diff[2:0]][X_diff[1:0]];
+   assign show_this_sprite[2] = (X_diff<5) & (Y_diff<5) & chartable[sprite_number[5:0]][Y_diff[2:0]][X_diff[2:0]];
    assign state=show_this_sprite[sprite_table];
    
    

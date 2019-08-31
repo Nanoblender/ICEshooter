@@ -21,7 +21,10 @@ module VGA(
  
    wire 		H_cntr_maxed = (H_cntr==383);//The Hsync freq is 12MHZ/383=31.33kHz
    wire 		V_cntr_maxed = (V_cntr==522);//The Vsync is 31.33MHz/522=60Hz
-
+   wire [8:0] 		H_cntrc=H_cntr-85;
+   wire [9:0] 		V_cntrc=(V_cntr-46); 		
+   wire 		H_valid=(H_cntr>84)&(H_cntr<384);
+   wire 		V_valid=(V_cntr>45)&(V_cntr<522);
    
    always@(posedge clk)
      begin	
@@ -39,7 +42,7 @@ module VGA(
    assign H_sync = (H_cntr>77);//There is a 6.35µs blanking for H sync
    assign V_sync = (V_cntr>45);//There is a 1.43ns blanking for V sync
    assign VGA_enable = (((H_cntr>84)&(H_cntr<384))&((V_cntr>45)&(V_cntr<522)));
-   assign H_pos = (H_cntr-85)*((H_cntr>84)&(H_cntr<384));
-   assign V_pos = ((V_cntr-46)>>1)*((V_cntr>45)&(V_cntr<522));//The vertical resolution is divided by 2 to have square(ish) pixels
+   assign H_pos = H_cntrc*H_valid;
+   assign V_pos = V_cntrc[9:1]*V_valid;//The vertical resolution is divided by 2 to have square(ish) pixels
 
 endmodule // VGA

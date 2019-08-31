@@ -29,7 +29,7 @@ flash: ${PROJ_NAME}.bin
 	iceprog ${PROJ_NAME}.bin
 
 sim:
-	verilator -Wall -cc ${TOP_CELL}.v --exe sim_main.cpp
+	verilator -Wall -Wno-UNUSED -cc ${TOP_CELL}.v --exe sim_main.cpp
 	make -C obj_dir -f V${TOP_CELL}.mk
 	obj_dir/V${TOP_CELL}
 
