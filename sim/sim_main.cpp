@@ -14,7 +14,7 @@ int main(int argc, char **argv){
     top->eval();
     top->clk=0;
     top->eval();
-    printf("cntr %i f_cntr: %i\n",top->top__DOT__scene,top->top__DOT__score);
+    printf("scene %i\n",top->top__DOT__mainFSM__DOT__scene_reg);
     usleep(100000);
   }
   delete top;
