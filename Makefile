@@ -2,8 +2,6 @@ PROJ_NAME=ICEshooter
 TARGET=hx8k
 PACKAGE=ct256
 TOP_CELL=top
-INCDIR=-Iverilog/display -Iverilog/game -Iverilog/top -Iverilog/utils
-VERILOG=$$(ls verilog/*.v)
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -15,7 +13,7 @@ NC='\033[0m'
 gen:
 
 	@echo -e "${GREEN} ---------------Synthesis--------------------------------${NC}\n"
-	yosys -p "synth_ice40 -top ${TOP_CELL} -json ${PROJ_NAME}.json" ${VERILOG}
+	yosys -s verilog/top.ys
 	@echo -e "${GREEN} ---------------Place and route--------------------------${NC}\n"
 	nextpnr-ice40 --json ${PROJ_NAME}.json --pcf fpga/${PROJ_NAME}.pcf --asc ${PROJ_NAME}.txt --${TARGET} --package ${PACKAGE}
 	@echo -e "${GREEN} ---------------Bitstream generation---------------------${NC}\n"
