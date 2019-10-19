@@ -2,6 +2,7 @@ PROJ_NAME=ICEshooter
 TARGET=hx8k
 PACKAGE=ct256
 TOP_CELL=top
+INCDIR=-Iverilog/game -Iverilog/display -Iverilog/utils
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
