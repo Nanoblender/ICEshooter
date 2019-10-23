@@ -1,0 +1,7 @@
+read_verilog verilog/top.v
+hierarchy -top top \
+	  -libdir verilog/game \
+	  -libdir verilog/utils \
+	  -libdir verilog/display
+proc
+show top

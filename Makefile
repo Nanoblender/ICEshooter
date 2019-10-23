@@ -20,6 +20,11 @@ gen:
 	@echo -e "${GREEN} ---------------Bitstream generation---------------------${NC}\n"
 	icepack ${PROJ_NAME}.txt ${PROJ_NAME}.bin
 
+show :
+	@echo -e "${GREEN} ---------------Displaying top--------------------------------${NC}\n"
+	yosys -s verilog/show.ys
+
+
 pnr:
 	yosys -p "synth_ice40 -top ${TOP_CELL} -json ${PROJ_NAME}.json" *.v
 	nextpnr-ice40 --json ${PROJ_NAME}.json --pcf ${PROJ_NAME}.pcf --asc ${PROJ_NAME}.txt --${TARGET} --package ${PACKAGE} --gui
