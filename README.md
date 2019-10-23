@@ -4,6 +4,7 @@ ICEshooter is a retro shoot them up made to be run on small FPGA like the ICE40-
 It started as a holiday project where I wanted to learn how to display an image on a CRT screen with an FPGA and get to know more about the open-source toolchain. In the end it ended up turning into a video-game.
 
 ![](./graph/pic.png) 
+
 ##Tools used
 The tool needed to generate the bitstream are the following:
 
