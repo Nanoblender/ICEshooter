@@ -35,6 +35,8 @@ make pnr
 
 The ```sim``` option will generate a simulation but the the testbench doesn't do much.
 
-##Schematics
+
+## Schematics
+
 
 ![](./graph/schematics.png)
