@@ -26,8 +26,8 @@ show :
 
 
 pnr:
-	yosys -p "synth_ice40 -top ${TOP_CELL} -json ${PROJ_NAME}.json" *.v
-	nextpnr-ice40 --json ${PROJ_NAME}.json --pcf ${PROJ_NAME}.pcf --asc ${PROJ_NAME}.txt --${TARGET} --package ${PACKAGE} --gui
+	yosys -s verilog/top.ys
+	nextpnr-ice40 --json ${PROJ_NAME}.json --pcf fpga/${PROJ_NAME}.pcf --asc ${PROJ_NAME}.txt --${TARGET} --package ${PACKAGE} --gui
 
 flash: ${PROJ_NAME}.bin
 	@echo -e "${GREEN} ----------------Programming------------------------------${NC}\n"
